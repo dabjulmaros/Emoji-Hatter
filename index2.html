@@ -27,26 +27,26 @@
         </div>
         <div class="block settings">
             <label>&nbsp;&nbsp;&nbsp;&nbsp;Size: </label>
-            <input id="SizeSlide" type="range" class="slider" min="-100" max="100" value="0">
-            <input id="SizeField" type="number" min="-100" max="100" value="0">
+            <input id="SizeSlide" type="range" class="slider" min="-200" max="200" value="0">
+            <input id="SizeField" type="number" min="-200" max="200" value="0">
             <div class="break"></div>
             <label>X offset: </label>
-            <input id="OffsetXSlide" value="0" type="range" class="slider" min="-200" max="200">
-            <input id="OffsetXField" value="0" type="number" min="-200" max="200">
+            <input id="OffsetXSlide" value="0" type="range" class="slider" min="-400" max="400">
+            <input id="OffsetXField" value="0" type="number" min="-400" max="240">
             <div class="break"></div>
             <label>Y offset: </label>
-            <input id="OffsetYSlide" value="0" type="range" class="slider" min="-200" max="200">
-            <input id="OffsetYField" value="0" type="number" min="-200" max="200">
+            <input id="OffsetYSlide" value="0" type="range" class="slider" min="-400" max="400">
+            <input id="OffsetYField" value="0" type="number" min="-400" max="400">
             <div class="break"></div>
             <label>Rotation: </label>
-            <input id="RotationSlide" value="0" type="range" class="slider" min="0" max="360">
-            <input id="RotationField" value="0" type="number" min="0" max="360">
+            <input id="RotationSlide" value="0" type="range" class="slider" min="0" max="359">
+            <input id="RotationField" value="0" type="number" min="0" max="359">
             <div class="break"></div>
             <label>Opacity : </label>
             <input id="TransparencySlide" value="100" type="range" class="slider" min="0" max="100">
             <input id="TransparencyField" value="100" type="number" min="0" max="100">
             <div class="break"></div>
-            <input type="checkbox" id="hatMirror" name="hatMirror" class="spaceVertical">
+            <input type="checkbox" id="Mirror" name="Mirror" class="spaceVertical">
             <label for="Mirror" class="spaceVertical">Mirror</label>
             <div class="break"></div>
             <button id="Reset" type="button" name="button">Reset Settings</button>
@@ -58,20 +58,18 @@
         <div class="block header">
             Layers:
         </div>
-        <div class="block layer">
-            <canvas width="50px" height="50px"></canvas>
-            Layer 1
+        <div id="layers" class="block layers">
         </div>
     </div>
     <div class="block main">
         <div class="block">
-            <button id="itemReset" type="button" name="button">
+            <button id="addItem" class="tool" type="button" name="button">
                 <span class="material-icons">add</span>
             </button>
-            <button id="itemReset" type="button" name="button">
+            <button id="removeItem" class="tool" type="button" name="button">
                 <span class="material-icons">clear</span>
             </button>
-            <button id="itemReset" type="button" name="button">
+            <button id="resetCanvas" class="tool important" type="button" name="button">
                 <span class="material-icons">remove_circle_outline</span>
             </button>
         </div>
