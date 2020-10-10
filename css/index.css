@@ -16,6 +16,9 @@ img{
   width:400px;
   height:400px;
   margin:  2rem;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag:none;
 }
 .controls{
   display: flex;

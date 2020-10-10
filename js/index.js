@@ -4,6 +4,8 @@ const ctx = canvas.getContext("2d");
 const img = document.querySelector("#result");
 
 let selectedLayer=0;
+var mousePosX,mousePosY,originalX,originalY;;
+let moving = false;
 
 const settingsTemplate={
   "value":"",
@@ -114,122 +116,103 @@ function addLayer(){
 function removeLayer(layer){
   layers.removeChild(layers.children[layer]);
   settings.splice(layer,1);
+
   if(selectedLayer !== 0)
     selectedLayer--;
+
   if(settings.length)
     changeSelectedLayer();
+
   generateHatted();
 }
 
 function changeSelectedLayer(){
-  if(document.querySelector('.selected')!==null){
+  if(document.querySelector('.selected')!==null)
     document.querySelector('.selected').classList.remove('selected');
-  }
+  
   layers.children[selectedLayer].classList.add('selected');
   
-  var value = settings[selectedLayer].SizeOffset;
-  document.getElementById("SizeField").value=value;
-  document.getElementById("SizeSlide").value=value;
-  value = settings[selectedLayer].OffsetX;
-  document.getElementById("OffsetXField").value=value;
-  document.getElementById("OffsetXSlide").value=value;
-  value = settings[selectedLayer].OffsetY;
-  document.getElementById("OffsetYField").value=value;
-  document.getElementById("OffsetYSlide").value=value;
-  value = settings[selectedLayer].Rotation;
-  document.getElementById("RotationField").value=value;
-  document.getElementById("RotationSlide").value=value;
-  value = settings[selectedLayer].Transparency;
-  document.getElementById("TransparencyField").value=value;
-  document.getElementById("TransparencySlide").value=value;
-  value = settings[selectedLayer].Mirror;
-  document.getElementById("Mirror").checked=value;
-
+  setSize(settings[selectedLayer].SizeOffset);
+  setOffsetX(settings[selectedLayer].OffsetX)
+  setOffsetY(settings[selectedLayer].OffsetY)
+  setRotation(settings[selectedLayer].Rotation);
+  setOpacity(settings[selectedLayer].Transparency);
+  setMirror(settings[selectedLayer].Mirror);
 }
 
 document.getElementById("SizeSlide").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("SizeField").value=value;
-  settings[selectedLayer].SizeOffset=value;
+  setSize(e.currentTarget.value);
   generateHatted();
 });
+
 document.getElementById("SizeField").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("SizeSlide").value=value;
-  settings[selectedLayer].SizeOffset=value;
+  setSize(e.currentTarget.value);
   generateHatted();
 });
 document.getElementById("OffsetXSlide").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("OffsetXField").value=value;
-  settings[selectedLayer].OffsetX=value;
+  setOffsetX(e.currentTarget.value);
   generateHatted();
 });
 document.getElementById("OffsetXField").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("OffsetXSlide").value=value;
-  settings[selectedLayer].OffsetX=value;
+  setOffsetX(e.currentTarget.value);
   generateHatted();
 });
 document.getElementById("OffsetYSlide").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("OffsetYField").value=value;
-  settings[selectedLayer].OffsetY=value;
+  setOffsetY(e.currentTarget.value);
   generateHatted();
 });
 document.getElementById("OffsetYField").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("OffsetYSlide").value=value;
-  settings[selectedLayer].OffsetY=value;
+  setOffsetY(e.currentTarget.value);
   generateHatted();
 });
+
+img.addEventListener("mousedown",e=>{
+  mousePosX= e.offsetX-200;
+  mousePosY= e.offsetY-200;
+  originalX = settings[selectedLayer].OffsetX;
+  originalY = settings[selectedLayer].OffsetY;
+  moving = true;
+});
+
+img.addEventListener("mouseup",e=>{
+  moving = false;
+});
+
+img.addEventListener('mousemove',e=>{
+  if(moving){
+    setOffsetX(originalX + (e.offsetX-200 - mousePosX));
+    setOffsetY(originalY + (e.offsetY-200 - mousePosY));
+    generateHatted();
+  }
+})
+
 document.getElementById("RotationSlide").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("RotationField").value=value;
-  settings[selectedLayer].Rotation=value;
+  setRotation(e.currentTarget.value);;
   generateHatted();
 });
 document.getElementById("RotationField").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("RotationSlide").value=value;
-  settings[selectedLayer].Rotation=value;
+  setRotation(e.currentTarget.value);
   generateHatted();
 });
 document.getElementById("TransparencySlide").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("TransparencyField").value=value;
-  settings[selectedLayer].Transparency=value;
+  setOpacity(e.currentTarget.value);
   generateHatted();
 });
 document.getElementById("TransparencyField").addEventListener("change",e=>{
-  const value = e.currentTarget.value;
-  document.getElementById("TransparencySlide").value=value;
-  settings[selectedLayer].Transparency=value;
+  setOpacity(e.currentTarget.value);
   generateHatted();
 });
   
 document.getElementById('Reset').addEventListener('click',e=>{
-  var value = 0;
-  document.getElementById("SizeField").value=value;
-  document.getElementById("SizeSlide").value=value;
-  settings[selectedLayer].SizeOffset=value;
-  document.getElementById("OffsetXField").value=value;
-  document.getElementById("OffsetXSlide").value=value;
-  settings[selectedLayer].OffsetX=value;
-  document.getElementById("OffsetYField").value=value;
-  document.getElementById("OffsetYSlide").value=value;
-  settings[selectedLayer].OffsetY=value;
-  document.getElementById("RotationField").value=value;
-  document.getElementById("RotationSlide").value=value;
-  settings[selectedLayer].Rotation=value;
-  value=100;
-  document.getElementById("TransparencyField").value=value;
-  document.getElementById("TransparencySlide").value=value;
-  settings[selectedLayer].Transparency=value;
-  document.getElementById("Mirror").checked=false;
-  settings[selectedLayer].hatMirror=false;
+  setSize(0);
+  setOffsetX(0);
+  setOffsetY(0);
+  setRotation(0)
+  setOpacity(100);
+  setMirror(false);
   generateHatted();
 });
+
 function getLayer(t){
   const target = t;
   const parent = target.parentElement;
@@ -275,3 +258,34 @@ function generateMad(){
   layers.children[2].querySelector('input').value="🤪";
   generateHatted();
 }
+
+function setOffsetX(num){
+  document.getElementById("OffsetXField").value=num;
+  document.getElementById("OffsetXSlide").value=num;
+  settings[selectedLayer].OffsetX=num;
+}
+function setOffsetY(num){
+  document.getElementById("OffsetYField").value=num;
+  document.getElementById("OffsetYSlide").value=num;
+  settings[selectedLayer].OffsetY=num;
+}
+function setRotation(num){
+  document.getElementById("RotationField").value=num;
+  document.getElementById("RotationSlide").value=num;
+  settings[selectedLayer].Rotation=num;
+}
+function setOpacity(num){
+  document.getElementById("TransparencyField").value=num;
+  document.getElementById("TransparencySlide").value=num;
+  settings[selectedLayer].Transparency=num;
+}
+function setSize(num){
+  document.getElementById("SizeField").value=num;
+  document.getElementById("SizeSlide").value=num;
+  settings[selectedLayer].SizeOffset=num;
+}
+function setMirror(bool){
+  document.getElementById("Mirror").checked=bool;
+  settings[selectedLayer].hatMirror=bool;
+}
+
