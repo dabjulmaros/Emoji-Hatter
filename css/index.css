@@ -74,7 +74,9 @@ img{
   flex-basis: 100%;
   height: 0;
 }
-
+.block.layer.selected input{
+  background: none;
+}
 input:not(.slider),select{
   -webkit-appearance: none;
   text-align: center;

@@ -5,7 +5,6 @@ const img = document.querySelector("#result");
 
 let selectedLayer=0;
 var mousePosX,mousePosY,originalX,originalY;;
-let moving = false;
 
 const settingsTemplate={
   "value":"",
@@ -30,7 +29,7 @@ function generateHatted(){
 
   // The size of the emoji is set with the font
   for(var layer = settings.length-1;layer>=0;layer--){
-    ctx.font = `${160+parseInt(settings[layer].SizeOffset)}px sans-serif`;
+    ctx.font = `${160+parseInt(settings[layer].SizeOffset)}px ${settings[layer].font?settings[layer].font:'sans-serif'}`;
     ctx.fillStyle=`rgba(0,0,0,${settings[layer].Transparency/100})`;
     ctx.save();
     ctx.translate(canvas.width*(1/2)+parseInt(settings[layer].OffsetX),canvas.height*(1/2)+parseInt(settings[layer].OffsetY));
@@ -64,7 +63,10 @@ document.querySelectorAll('#showSettings').forEach(node=>{
 });
 
 document.getElementById('addItem').addEventListener('click',e=>{
-    addLayer();
+  settings.unshift(JSON.parse(JSON.stringify(settingsTemplate)));
+  addLayer();
+  selectedLayer = 0;
+  changeSelectedLayer();
 });
 document.getElementById('removeItem').addEventListener('click',e=>{
     removeLayer(selectedLayer);
@@ -72,13 +74,12 @@ document.getElementById('removeItem').addEventListener('click',e=>{
 document.getElementById('resetCanvas').addEventListener('click',e=>{
   let c = confirm("You are about to remove everything.");
   if(c){
-    for(var layer = settings.length-1;layer>=0;layer--){
-      removeLayer(layer);
-    }
+    resetCanvas();
     addLayer();
     generateHatted();
   }
 });
+
 
 document.getElementById("Mirror").addEventListener("click",e=>{
   settings[selectedLayer].Mirror=!settings[selectedLayer].Mirror;
@@ -86,7 +87,6 @@ document.getElementById("Mirror").addEventListener("click",e=>{
 });
 
 function addLayer(){
-  settings.unshift(JSON.parse(JSON.stringify(settingsTemplate)));
   const div = document.createElement('div');
   div.classList.add('block','layer');
   const input = document.createElement('input');
@@ -109,8 +109,6 @@ function addLayer(){
     generateHatted();
   })
   layers.insertBefore(div,layers.childNodes[0]);
-  selectedLayer = 0;
-  changeSelectedLayer();
 }
 
 function removeLayer(layer){
@@ -124,6 +122,12 @@ function removeLayer(layer){
     changeSelectedLayer();
 
   generateHatted();
+}
+
+function resetCanvas(){
+  for(var layer = settings.length-1;layer>=0;layer--){
+    removeLayer(layer);
+  }
 }
 
 function changeSelectedLayer(){
@@ -167,21 +171,16 @@ document.getElementById("OffsetYField").addEventListener("change",e=>{
 });
 
 img.addEventListener("mousedown",e=>{
-  mousePosX= e.offsetX-200;
-  mousePosY= e.offsetY-200;
+  mousePosX = e.offsetX-(canvas.width/2);
+  mousePosY = e.offsetY-(canvas.height/2);
   originalX = settings[selectedLayer].OffsetX;
   originalY = settings[selectedLayer].OffsetY;
-  moving = true;
 });
 
-img.addEventListener("mouseup",e=>{
-  moving = false;
-});
-
-img.addEventListener('mousemove',e=>{
-  if(moving){
-    setOffsetX(originalX + (e.offsetX-200 - mousePosX));
-    setOffsetY(originalY + (e.offsetY-200 - mousePosY));
+img.addEventListener('mousemove',mouse=>{
+  if(mouse.buttons==1){
+    setOffsetX(originalX + (mouse.offsetX-(canvas.width/2) - mousePosX));
+    setOffsetY(originalY + (mouse.offsetY-(canvas.height/2) - mousePosY));
     generateHatted();
   }
 })
@@ -260,29 +259,34 @@ function generateMad(){
 }
 
 function setOffsetX(num){
-  document.getElementById("OffsetXField").value=num;
-  document.getElementById("OffsetXSlide").value=num;
-  settings[selectedLayer].OffsetX=num;
+  const value = parseInt(num);
+  document.getElementById("OffsetXField").value=value;
+  document.getElementById("OffsetXSlide").value=value;
+  settings[selectedLayer].OffsetX=value;
 }
 function setOffsetY(num){
-  document.getElementById("OffsetYField").value=num;
-  document.getElementById("OffsetYSlide").value=num;
-  settings[selectedLayer].OffsetY=num;
+  const value = parseInt(num);
+  document.getElementById("OffsetYField").value=value;
+  document.getElementById("OffsetYSlide").value=value;
+  settings[selectedLayer].OffsetY=value;
 }
 function setRotation(num){
-  document.getElementById("RotationField").value=num;
-  document.getElementById("RotationSlide").value=num;
-  settings[selectedLayer].Rotation=num;
+  const value = parseInt(num);
+  document.getElementById("RotationField").value=value;
+  document.getElementById("RotationSlide").value=value;
+  settings[selectedLayer].Rotation=value;
 }
 function setOpacity(num){
-  document.getElementById("TransparencyField").value=num;
-  document.getElementById("TransparencySlide").value=num;
-  settings[selectedLayer].Transparency=num;
+  const value = parseInt(num);
+  document.getElementById("TransparencyField").value=value;
+  document.getElementById("TransparencySlide").value=value;
+  settings[selectedLayer].Transparency=value;
 }
 function setSize(num){
-  document.getElementById("SizeField").value=num;
-  document.getElementById("SizeSlide").value=num;
-  settings[selectedLayer].SizeOffset=num;
+  const value = parseInt(num);
+  document.getElementById("SizeField").value=value;
+  document.getElementById("SizeSlide").value=value;
+  settings[selectedLayer].SizeOffset=value;
 }
 function setMirror(bool){
   document.getElementById("Mirror").checked=bool;
