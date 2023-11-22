@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Css Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="css/test.css">
+  <script src="js/test.js" defer></script>
+</head>
+<body>
+  <div id="div" class="closed">
+    <span class="material-icons" id="icon">
+      format_size
+    </span>
+    <div class="controls">
+      <label for="fontStyle">Font Style: </label>
+      <select name="fontStyle" id="fontStyle">
+       <option selected value="normal">Normal</option>
+       <option value="italic">Italic</option>
+       <option value="oblique">Oblique</option>
+      </select>
+      <label for="fontVariant">Font Variant: </label>
+      <select name="fontVariant" id="fontVariant">
+       <option selected value="normal">Normal</option>
+       <option value="small-caps">Small Caps</option>
+      </select>
+      <label for='fontWeight'>Font Weight: </label>
+      <input type="text" name="fontWeight" id="fontWeight" list="weightOpt">
+      <datalist id="weightOpt">
+        <option value="normal">
+        <option value="bold">
+        <option value="bolder">
+        <option value="lighter">
+        <option value="100">
+        <option value="200">
+        <option value="300">
+        <option value="400">
+        <option value="500">
+        <option value="600">
+        <option value="700">
+        <option value="800">
+        <option value="900">
+      </datalist>
+    </div>
+  </div>
+</body>
+</html>
