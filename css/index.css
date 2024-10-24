@@ -138,7 +138,8 @@ select {
 .layer input {
   margin: 0;
 }
-input[type="number"] {
+input[type="number"],
+input[type="color"] {
   width: 6rem;
 }
 input[type="checkbox"] {
@@ -183,16 +184,62 @@ button:active {
   position: relative;
   left: -1rem;
 }
-label.scrolling::before {
-  font-family: "Material Icons";
-  content: "swap_vert";
-  -webkit-font-feature-settings: "liga";
+
+.material-icons-rounded,
+.material-icons-rounded,
+.material-icons-sharp {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
   font-feature-settings: "liga";
-  position: relative;
-  left: 0rem;
-  top: 0.3rem;
-  width: 0;
-  height: 0;
+}
+.material-icons-rounded {
+  font-family: "Material Symbols Rounded";
+}
+
+.material-icons-sharp {
+  font-family: "Material Symbols Sharp";
+}
+label {
+  text-align: right;
+  min-width: 173px;
+}
+label.scrolling::before {
+  font-family: "Material Symbols Outlined";
+  content: "swap_vert";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: "liga";
   opacity: 0.2;
 }
 input.slider {

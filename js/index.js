@@ -40,10 +40,18 @@ function generateHatted() {
 
   // The size of the emoji is set with the font
   for (var layer = settings.length - 1; layer >= 0; layer--) {
-    ctx.font = `${160 + parseInt(settings[layer].SizeOffset)}px ${
-      settings[layer].font ? settings[layer].font : "sans-serif"
-    }`;
-    ctx.fillStyle = `rgba(0,0,0,${settings[layer].Transparency / 100})`;
+    let fontPicked;
+    switch (settings[layer].font ?? "sans-serif") {
+      case "Outlined":
+      case "Sharp":
+      case "Outlined":
+        fontPicked = `"Material Symbols ${settings[layer].font}"`;
+        break;
+      default:
+        fontPicked = settings[layer].font ?? "sans-serif";
+    }
+    ctx.font = `${160 + parseInt(settings[layer].SizeOffset)}px ${fontPicked}`;
+    ctx.fillStyle = `rgba(${settings[layer].color?.r ?? 0},${settings[layer].color?.g ?? 0},${settings[layer].color?.b ?? 0},${settings[layer].Transparency / 100})`;
     ctx.save();
     ctx.translate(
       canvas.width * (1 / 2) + parseInt(settings[layer].OffsetX),
@@ -119,6 +127,7 @@ document.getElementById("Mirror").addEventListener("click", (e) => {
   generateHatted();
 });
 
+
 function addLayer() {
   const div = document.createElement("div");
   div.classList.add("block", "layer");
@@ -135,7 +144,7 @@ function addLayer() {
     pos = getLayer(document.querySelector(".selected"));
     moveLayer(pos, -1);
   });
-  layerUp.innerHTML = `<span class="material-icons">expand_less</span>`;
+  layerUp.innerHTML = `<span class="material-icons-rounded">expand_less</span>`;
 
   const layerDown = document.createElement("button");
   layerDown.addEventListener("click", (e) => {
@@ -143,7 +152,7 @@ function addLayer() {
     pos = getLayer(document.querySelector(".selected"));
     moveLayer(pos, 1);
   });
-  layerDown.innerHTML = `<span class="material-icons">expand_more</span>`;
+  layerDown.innerHTML = `<span class="material-icons-rounded">expand_more</span>`;
 
   controls.appendChild(layerUp);
   controls.appendChild(layerDown);
@@ -220,6 +229,8 @@ function changeSelectedLayer() {
   setRotation(settings[selectedLayer].Rotation);
   setOpacity(settings[selectedLayer].Transparency);
   setMirror(settings[selectedLayer].Mirror);
+  setColor(settings[selectedLayer].color);
+  setFont(settings[selectedLayer].font ?? "sans-serif");
 
   lastScrolled = temp;
   setScrolling(lastScrolled);
@@ -248,6 +259,15 @@ document.getElementById("OffsetYSlide").addEventListener("change", (e) => {
 });
 document.getElementById("OffsetYField").addEventListener("change", (e) => {
   setOffsetY(e.currentTarget.value);
+  generateHatted();
+});
+
+document.getElementById("ColorPicker").addEventListener("input", (e) => {
+  setColor(e.currentTarget.value);
+  generateHatted();
+});
+document.getElementById("FontStyle").addEventListener("input", (e) => {
+  setFont(e.currentTarget.value);
   generateHatted();
 });
 
@@ -306,6 +326,7 @@ document.getElementById("Reset").addEventListener("click", (e) => {
   setRotation(0);
   setOpacity(100);
   setMirror(false);
+  setColor('#000000');
   generateHatted();
 });
 
@@ -502,6 +523,22 @@ function setMirror(bool) {
   settings[selectedLayer].hatMirror = bool;
 }
 
+function setColor(value) {
+  if (typeof (value) == "string") {
+    settings[selectedLayer].color = hexToRgb(value);
+    document.getElementById("ColorPicker").value = value
+  } else {
+    settings[selectedLayer].color = value;
+    let hex = rgbToHex(value?.r ?? 0, value?.g ?? 0, value?.b ?? 0);
+    document.getElementById("ColorPicker").value = hex
+  }
+}
+
+function setFont(value) {
+  document.getElementById("FontStyle").value = value;
+  settings[selectedLayer].font = value;
+}
+
 function parseText() {
   let text = document.getElementById("textArr").value;
   if (text == "") return [32, 64, 128];
@@ -544,4 +581,25 @@ function saveData(data, fileName) {
     window.URL.revokeObjectURL(url);
     a.remove();
   }, 1000);
+}
+
+
+//https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
