@@ -166,10 +166,26 @@ function addLayer() {
   controls.appendChild(layerUp);
   controls.appendChild(layerDown);
 
+  const duplicateControl = document.createElement("div");
+  duplicateControl.classList.add("layerControl");
+  duplicateControl.classList.add("duplicate");
+
+  const duplicateButton = document.createElement("button");
+  duplicateButton.addEventListener("click", (e) => {
+    event.stopPropagation();
+    //  duplicate layer
+    pos = getLayer(document.querySelector(".selected"));
+    duplicateLayer(pos);
+  });
+  duplicateButton.innerHTML = `<span class="material-icons-round">content_copy</span>`;
+  duplicateControl.appendChild(duplicateButton);
+
+
   const divBreak = document.createElement("div");
   divBreak.classList.add("break");
 
   div.appendChild(divBreak);
+  div.appendChild(duplicateControl)
   div.appendChild(input);
   div.appendChild(controls);
 
@@ -213,10 +229,31 @@ function moveLayer(pos, move) {
   selectedLayer = pos + move;
   changeSelectedLayer();
 
-  for (var x = 0; x < settings.length; x++)
-    layers.children[x].querySelector("input").value = settings[x].value;
+  setLayerInputs();
 
   generateHatted();
+}
+
+function duplicateLayer(pos) {
+  const current = JSON.stringify(settings[pos]);
+
+  // settings.splice(pos, 1);
+  settings.splice(pos, 0, JSON.parse(current));
+  addLayer();
+  changeSelectedLayer();
+
+  setLayerInputs();
+
+  generateHatted();
+}
+
+function setLayerInputs() {
+  for (var x = 0; x < settings.length; x++) {
+    let target = layers.children[x].querySelector("input");
+    target.value = settings[x].value;
+    target.setAttribute("list", dataListSelector(settings[x].Font, target.value));
+    target.style.fontFamily = fontSelector(settings[x].Font, target.value);
+  }
 }
 
 function resetCanvas() {

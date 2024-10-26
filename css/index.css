@@ -1,3 +1,7 @@
+:root {
+  --accentColor: rgb(255, 200, 60);
+}
+
 body {
   margin: 0;
   background: #121212;
@@ -58,9 +62,13 @@ img {
   margin: 5px;
   display: none;
 }
-.block.layer.selected input {
-  margin-left: calc(1rem + 40px);
+.selected div.layerControl.duplicate,
+.block.layer.selected div.layerControl.duplicate button {
+  display: flex;
 }
+/* .block.layer.selected input {
+  margin-left: calc(1rem + 40px);
+} */
 .selected .layerControl {
   display: flex;
 }
@@ -383,7 +391,7 @@ input.slider::-webkit-slider-thumb {
   font-size: 16px;
 }
 .sass a {
-  color: rgb(255, 176, 46);
+  color: var(--accentColor);
 }
 .sass span {
   height: 40px;
