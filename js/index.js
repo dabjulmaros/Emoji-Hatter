@@ -6,6 +6,8 @@
  * 2-- Add custom emoji keyboard
  *      Have it support search and recently used emojis...
  *      Just like the system emoji keyboard... but worse
+ * 
+ * 3-- Add base 64 image support??
  */
 //-----------------------------//
 const canvas = document.querySelector("#canvas");
@@ -23,6 +25,10 @@ const settingsTemplate = {
   OffsetY: 0,
   SizeOffset: 0,
   Mirror: false,
+  Color: { r: 0, g: 0, b: 0 },
+  Font: "sans-serif",
+  Stroke: false,
+  StrokeWidth: 0,
   Rotation: 0,
   Transparency: 100,
 };
@@ -40,18 +46,9 @@ function generateHatted() {
 
   // The size of the emoji is set with the font
   for (var layer = settings.length - 1; layer >= 0; layer--) {
-    let fontPicked;
-    switch (settings[layer].font ?? "sans-serif") {
-      case "Outlined":
-      case "Sharp":
-      case "Outlined":
-        fontPicked = `"Material Symbols ${settings[layer].font}"`;
-        break;
-      default:
-        fontPicked = settings[layer].font ?? "sans-serif";
-    }
-    ctx.font = `${160 + parseInt(settings[layer].SizeOffset)}px ${fontPicked}`;
-    ctx.fillStyle = `rgba(${settings[layer].color?.r ?? 0},${settings[layer].color?.g ?? 0},${settings[layer].color?.b ?? 0},${settings[layer].Transparency / 100})`;
+
+    ctx.font = `${160 + parseInt(settings[layer].SizeOffset)}px ${fontSelector(settings[layer].Font, settings[layer].value)}`;
+    ctx.fillStyle = `rgba(${settings[layer].Color?.r ?? 0},${settings[layer].Color?.g ?? 0},${settings[layer].Color?.b ?? 0},${settings[layer].Transparency / 100})`;
     ctx.save();
     ctx.translate(
       canvas.width * (1 / 2) + parseInt(settings[layer].OffsetX),
@@ -61,7 +58,13 @@ function generateHatted() {
     if (settings[layer].Mirror) {
       ctx.scale(-1, 1);
     }
-    ctx.fillText(settings[layer].value, 0, 0);
+    if (settings[layer].Stroke) {
+      ctx.strokeStyle = `rgba(${settings[layer].Color?.r ?? 0},${settings[layer].Color?.g ?? 0},${settings[layer].Color?.b ?? 0},${settings[layer].Transparency / 100})`;
+      ctx.lineWidth = settings[layer].StrokeWidth;
+      ctx.strokeText(settings[layer].value, 0, 0);
+    } else {
+      ctx.fillText(settings[layer].value, 0, 0);
+    }
     ctx.restore();
   }
 
@@ -85,7 +88,7 @@ document.querySelectorAll("#showSettings").forEach((node) => {
   });
 });
 
-["Size", "Rotation", "Transparency"].forEach((name) => {
+["Size", "Rotation", "Transparency", "StrokeWidth"].forEach((name) => {
   document.getElementById(`${name}Label`).addEventListener("click", (e) => {
     lastScrolled = name;
     setScrolling(name);
@@ -127,6 +130,12 @@ document.getElementById("Mirror").addEventListener("click", (e) => {
   generateHatted();
 });
 
+document.getElementById("Stroke").addEventListener("click", (e) => {
+  settings[selectedLayer].Stroke = !settings[selectedLayer].Stroke;
+  generateHatted();
+});
+
+
 
 function addLayer() {
   const div = document.createElement("div");
@@ -144,7 +153,7 @@ function addLayer() {
     pos = getLayer(document.querySelector(".selected"));
     moveLayer(pos, -1);
   });
-  layerUp.innerHTML = `<span class="material-icons-rounded">expand_less</span>`;
+  layerUp.innerHTML = `<span class="material-icons-round">expand_less</span>`;
 
   const layerDown = document.createElement("button");
   layerDown.addEventListener("click", (e) => {
@@ -152,7 +161,7 @@ function addLayer() {
     pos = getLayer(document.querySelector(".selected"));
     moveLayer(pos, 1);
   });
-  layerDown.innerHTML = `<span class="material-icons-rounded">expand_more</span>`;
+  layerDown.innerHTML = `<span class="material-icons-round">expand_more</span>`;
 
   controls.appendChild(layerUp);
   controls.appendChild(layerDown);
@@ -176,6 +185,8 @@ function addLayer() {
   input.addEventListener("input", (e) => {
     let layer = getLayer(e.target.parentElement);
     settings[layer].value = e.target.value;
+    document.querySelector('.layer.selected input').setAttribute("list", dataListSelector(settings[layer].Font, e.target.value));
+    e.target.style.fontFamily = fontSelector(settings[layer].Font, e.target.value);
     generateHatted();
   });
 
@@ -223,20 +234,22 @@ function changeSelectedLayer() {
 
   layers.children[selectedLayer].classList.add("selected");
 
-  setSize(settings[selectedLayer].SizeOffset);
-  setOffsetX(settings[selectedLayer].OffsetX);
-  setOffsetY(settings[selectedLayer].OffsetY);
-  setRotation(settings[selectedLayer].Rotation);
-  setOpacity(settings[selectedLayer].Transparency);
-  setMirror(settings[selectedLayer].Mirror);
-  setColor(settings[selectedLayer].color);
-  setFont(settings[selectedLayer].font ?? "sans-serif");
+  setSize(settings[selectedLayer].SizeOffset ?? 0);
+  setOffsetX(settings[selectedLayer].OffsetX ?? 0);
+  setOffsetY(settings[selectedLayer].OffsetY ?? 0);
+  setRotation(settings[selectedLayer].Rotation ?? 0);
+  setOpacity(settings[selectedLayer].Transparency ?? 100);
+  setMirror(settings[selectedLayer].Mirror ?? false);
+  setStroke(settings[selectedLayer].Stroke ?? false)
+  SetStrokeWidth(settings[selectedLayer].StrokeWidth ?? 0)
+  setColor(settings[selectedLayer].Color ?? "#000000");
+  setFont(settings[selectedLayer].Font ?? "sans-serif");
 
   lastScrolled = temp;
   setScrolling(lastScrolled);
 }
 
-document.getElementById("SizeSlide").addEventListener("change", (e) => {
+document.getElementById("SizeSlide").addEventListener("input", (e) => {
   setSize(e.currentTarget.value);
   generateHatted();
 });
@@ -245,7 +258,7 @@ document.getElementById("SizeField").addEventListener("change", (e) => {
   setSize(e.currentTarget.value);
   generateHatted();
 });
-document.getElementById("OffsetXSlide").addEventListener("change", (e) => {
+document.getElementById("OffsetXSlide").addEventListener("input", (e) => {
   setOffsetX(e.currentTarget.value);
   generateHatted();
 });
@@ -253,7 +266,7 @@ document.getElementById("OffsetXField").addEventListener("change", (e) => {
   setOffsetX(e.currentTarget.value);
   generateHatted();
 });
-document.getElementById("OffsetYSlide").addEventListener("change", (e) => {
+document.getElementById("OffsetYSlide").addEventListener("input", (e) => {
   setOffsetY(e.currentTarget.value);
   generateHatted();
 });
@@ -268,6 +281,16 @@ document.getElementById("ColorPicker").addEventListener("input", (e) => {
 });
 document.getElementById("FontStyle").addEventListener("input", (e) => {
   setFont(e.currentTarget.value);
+  generateHatted();
+});
+
+document.getElementById("StrokeWidthSlide").addEventListener("input", (e) => {
+  SetStrokeWidth(e.currentTarget.value);
+  generateHatted();
+});
+
+document.getElementById("StrokeWidthField").addEventListener("change", (e) => {
+  SetStrokeWidth(e.currentTarget.value);
   generateHatted();
 });
 
@@ -287,6 +310,7 @@ img.addEventListener("mousemove", (mouse) => {
 });
 
 img.addEventListener("wheel", (e) => {
+  e.preventDefault();
   switch (lastScrolled) {
     case "Size":
       setSize((settings[selectedLayer].SizeOffset += e.deltaY / 50));
@@ -297,12 +321,15 @@ img.addEventListener("wheel", (e) => {
     case "Transparency":
       setOpacity((settings[selectedLayer].Transparency += e.deltaY / 50));
       break;
+    case "StrokeWidth":
+      SetStrokeWidth((settings[selectedLayer].StrokeWidth += e.deltaY / 50));
+      break;
     default:
   }
   generateHatted();
 });
 
-document.getElementById("RotationSlide").addEventListener("change", (e) => {
+document.getElementById("RotationSlide").addEventListener("input", (e) => {
   setRotation(e.currentTarget.value);
   generateHatted();
 });
@@ -310,7 +337,7 @@ document.getElementById("RotationField").addEventListener("change", (e) => {
   setRotation(e.currentTarget.value);
   generateHatted();
 });
-document.getElementById("TransparencySlide").addEventListener("change", (e) => {
+document.getElementById("TransparencySlide").addEventListener("input", (e) => {
   setOpacity(e.currentTarget.value);
   generateHatted();
 });
@@ -326,7 +353,9 @@ document.getElementById("Reset").addEventListener("click", (e) => {
   setRotation(0);
   setOpacity(100);
   setMirror(false);
+  setStroke(false);
   setColor('#000000');
+  setFont('sans-serif');
   generateHatted();
 });
 
@@ -520,23 +549,40 @@ function setSize(num) {
 }
 function setMirror(bool) {
   document.getElementById("Mirror").checked = bool;
-  settings[selectedLayer].hatMirror = bool;
+  settings[selectedLayer].Mirror = bool;
+}
+
+function setStroke(bool) {
+  document.getElementById("Stroke").checked = bool;
+  settings[selectedLayer].Stroke = bool;
+}
+
+function SetStrokeWidth(num) {
+  const value = parseInt(num);
+  document.getElementById("StrokeWidthField").value = value;
+  document.getElementById("StrokeWidthSlide").value = value;
+  settings[selectedLayer].StrokeWidth = value;
+
+  setScrolling("StrokeWidth");
 }
 
 function setColor(value) {
   if (typeof (value) == "string") {
-    settings[selectedLayer].color = hexToRgb(value);
-    document.getElementById("ColorPicker").value = value
+    settings[selectedLayer].Color = hexToRgb(value);
+    document.getElementById("ColorPicker").value = value;
+    document.getElementById("ColorShow").style.backgroundColor = value;
   } else {
-    settings[selectedLayer].color = value;
+    settings[selectedLayer].Color = value;
     let hex = rgbToHex(value?.r ?? 0, value?.g ?? 0, value?.b ?? 0);
-    document.getElementById("ColorPicker").value = hex
+    document.getElementById("ColorPicker").value = hex;
+    document.getElementById("ColorShow").style.backgroundColor = hex;
   }
 }
 
 function setFont(value) {
   document.getElementById("FontStyle").value = value;
-  settings[selectedLayer].font = value;
+  settings[selectedLayer].Font = value;
+  document.querySelector('.layer.selected input').style.fontFamily = fontSelector(value, settings[selectedLayer].value);
 }
 
 function parseText() {
@@ -581,6 +627,57 @@ function saveData(data, fileName) {
     window.URL.revokeObjectURL(url);
     a.remove();
   }, 1000);
+}
+function fontSelector(value, string) {
+  let fontPicked;
+  switch (value ?? "sans-serif") {
+    case "Filled":
+      if (icons[string]?.includes(value.toLowerCase())) {
+        fontPicked = "Material Icons"
+      }
+      break
+    case "Outlined":
+    case "Round":
+    case "Sharp":
+    case "Two Tone":
+      if (icons[string]?.includes(value.toLowerCase().replace(' ', '_'))) {
+        fontPicked = `"Material Icons ${value}"`;
+      }
+      break;
+    default:
+      fontPicked = value ?? "sans-serif";
+  }
+  return fontPicked ?? "sans-serif";
+}
+function dataListSelector(style, string) {
+  let datalist = "";
+  if (icons[string])
+    if (icons[string].includes(style.toLowerCase().replace(' ', '_')))
+      return '';
+
+  if (string.length > 2) {
+    switch (style ?? "sans-serif") {
+      case "Filled":
+        datalist = "FilledIcons"
+        break
+      case "Outlined":
+        datalist = "OutlinedIcons"
+        break
+      case "Round":
+        datalist = "RoundedIcons"
+        break
+      case "Sharp":
+        datalist = "SharpIcons"
+        break
+      case "Two Tone":
+        datalist = "TwoToneIcons"
+        break;
+      default:
+        datalist = "";
+    }
+  }
+
+  return datalist
 }
 
 

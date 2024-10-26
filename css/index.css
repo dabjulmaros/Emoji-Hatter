@@ -29,7 +29,7 @@ img {
 }
 .block {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   flex-wrap: wrap;
 }
 .block.main {
@@ -90,6 +90,7 @@ img {
 .layer {
   padding: 0.5rem 0;
   width: 30rem;
+  justify-content: center;
 }
 .layers {
   max-height: 15rem;
@@ -105,6 +106,7 @@ img {
   height: 18rem;
   overflow: auto;
   margin: 0;
+  padding: 0 1rem;
 }
 .block.settings.show {
   display: flex;
@@ -119,6 +121,7 @@ img {
 .block.layer.selected input {
   background: none;
 }
+#ColorShow,
 input:not(.slider),
 select {
   -webkit-appearance: none;
@@ -142,6 +145,10 @@ input[type="number"],
 input[type="color"] {
   width: 6rem;
 }
+
+.CheckBoxWrap {
+  margin: 0 auto;
+}
 input[type="checkbox"] {
   -webkit-appearance: checkbox;
   cursor: pointer;
@@ -153,6 +160,14 @@ select {
   width: auto;
   height: auto;
 }
+#ColorShow {
+  background-color: #0c0c0c;
+  border: solid 2px white;
+  cursor: pointer;
+  width: 6rem;
+  /* height: 2rem; */
+}
+
 .spaceVertical {
   position: relative;
   margin: 1rem 0;
@@ -171,6 +186,7 @@ button {
   padding: 0.5rem;
   border: white solid 2px;
   cursor: pointer;
+  margin: 0 auto;
 }
 button:hover {
   color: white;
@@ -180,18 +196,14 @@ button:active {
   color: #121212;
   background: white;
 }
-.scrolling {
-  position: relative;
-  left: -1rem;
-}
 
-.material-icons-rounded,
+/* .material-icons-outlined,
 .material-icons-rounded,
 .material-icons-sharp {
   font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
-  font-size: 24px; /* Preferred icon size */
+  font-size: 24px; 
   display: inline-block;
   line-height: 1;
   text-transform: none;
@@ -199,50 +211,37 @@ button:active {
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
-  /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
-  /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
-  /* Support for IE. */
   font-feature-settings: "liga";
-}
+} 
 .material-icons-rounded {
   font-family: "Material Symbols Rounded";
 }
 
 .material-icons-sharp {
   font-family: "Material Symbols Sharp";
-}
+} */
 label {
   text-align: right;
-  min-width: 173px;
+  min-width: 205px;
 }
-label.scrolling::before {
-  font-family: "Material Symbols Outlined";
+label.scrollable {
+  position: relative;
+}
+label.scrollable::before {
+  font-family: "Material Icons Outlined";
   content: "swap_vert";
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px; /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-  /* Support for all WebKit browsers. */
-  -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
-  /* Support for IE. */
-  font-feature-settings: "liga";
   opacity: 0.2;
+  position: absolute;
+  left: 0rem;
+}
+label.scrollable.scrolling::before {
+  font-family: "Material Icons Round";
 }
 input.slider {
+  width: 120px;
   -webkit-appearance: none;
   height: 0.5rem;
   margin-top: 1.3rem;
@@ -375,4 +374,51 @@ input.slider::-webkit-slider-thumb {
 ::-webkit-scrollbar-thumb {
   background-color: #babac0;
   border-radius: 16px;
+}
+
+.sass {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 16px;
+}
+.sass a {
+  color: rgb(255, 176, 46);
+}
+.sass span {
+  height: 40px;
+}
+.sass:hover div {
+  opacity: 1;
+  width: 300px;
+  padding: 2rem;
+  border: 5px solid white;
+  transition: opacity 0.3s linear, width 0.3s linear, padding 0s linear,
+    border 0s linear;
+}
+.sass > div {
+  display: block;
+  position: absolute;
+  line-height: 2rem;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 16rem;
+  background: #0c0c0c;
+  padding: 0;
+  border: 0px solid white;
+  transition: opacity 0.3s linear, width 0.3s linear, padding 0s linear 0.3s,
+    border 0s linear 0.3s;
+  border-radius: 1rem;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.sass > div > ul {
+  z-index: 3;
+  position: absolute;
+  width: 300px;
+  margin: 0;
+  padding: 0;
+  /* list-style: none; */
 }
