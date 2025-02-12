@@ -31,49 +31,75 @@ const settingsTemplate = {
   StrokeWidth: 0,
   Rotation: 0,
   Transparency: 100,
+  Masking: false,
+  Mask: null
 };
 const layers = document.getElementById("layers");
 
 let settings = [];
 
-// use these alignment properties for "better" positioning
-ctx.textAlign = "center";
-ctx.textBaseline = "middle";
 
 generateMad();
 function generateHatted() {
+
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
 
   // The size of the emoji is set with the font
   for (var layer = settings.length - 1; layer >= 0; layer--) {
 
-    ctx.font = `${160 + parseInt(settings[layer].SizeOffset)}px ${fontSelector(settings[layer].Font, settings[layer].value)}`;
-    ctx.fillStyle = `rgba(${settings[layer].Color?.r ?? 0},${settings[layer].Color?.g ?? 0},${settings[layer].Color?.b ?? 0},${settings[layer].Transparency / 100})`;
-    ctx.save();
-    ctx.translate(
-      canvas.width * (1 / 2) + parseInt(settings[layer].OffsetX),
-      canvas.height * (1 / 2) + parseInt(settings[layer].OffsetY)
-    );
-    ctx.rotate((parseInt(settings[layer].Rotation) * Math.PI) / 180);
-    if (settings[layer].Mirror) {
-      ctx.scale(-1, 1);
-    }
-    if (settings[layer].Stroke) {
-      ctx.strokeStyle = `rgba(${settings[layer].Color?.r ?? 0},${settings[layer].Color?.g ?? 0},${settings[layer].Color?.b ?? 0},${settings[layer].Transparency / 100})`;
-      ctx.lineWidth = settings[layer].StrokeWidth;
-      ctx.strokeText(settings[layer].value, 0, 0);
-    } else {
-      ctx.fillText(settings[layer].value, 0, 0);
-    }
-    ctx.restore();
+    ctx.drawImage(renderLayer(layer), 0, 0);
+
   }
+
 
   img.src = canvas.toDataURL("image/png");
 
-  // canvas.toBlob(function(blob) {
-  //     const item = new ClipboardItem({ "image/png": blob });
-  //     navigator.clipboard.write([item]);
+  // canvas.toBlob(function (blob) {
+  //   const item = new ClipboardItem({ "image/png": blob });
+  //   navigator.clipboard.write([item]);
   // });
+}
+
+function renderLayer(layer) {
+  const renderCanvas = document.createElement('canvas');
+  const renderCtx = renderCanvas.getContext('2d');
+
+  renderCanvas.width = canvas.width;
+  renderCanvas.height = canvas.height;
+
+  renderCtx.textAlign = "center";
+  renderCtx.textBaseline = "middle";
+
+  renderCtx.font = `${160 + parseInt(settings[layer].SizeOffset)}px ${fontSelector(settings[layer].Font, settings[layer].value)}`;
+  renderCtx.fillStyle = `rgba(${settings[layer].Color?.r ?? 0},${settings[layer].Color?.g ?? 0},${settings[layer].Color?.b ?? 0},${settings[layer].Transparency / 100})`;
+
+  if (settings[layer].Mask != null) {
+    renderCtx.drawImage(settings[layer].Mask, 0, 0);
+    renderCtx.globalCompositeOperation = 'source-out';
+  }
+
+  renderCtx.translate(
+    (renderCanvas.width / 2) + parseInt(settings[layer].OffsetX),
+    (renderCanvas.height / 2) + parseInt(settings[layer].OffsetY)
+  );
+
+
+  renderCtx.rotate((parseInt(settings[layer].Rotation) * Math.PI) / 180);
+  if (settings[layer].Mirror) {
+    renderCtx.scale(-1, 1);
+  }
+  if (settings[layer].Stroke) {
+    renderCtx.strokeStyle = `rgba(${settings[layer].Color?.r ?? 0},${settings[layer].Color?.g ?? 0},${settings[layer].Color?.b ?? 0},${settings[layer].Transparency / 100})`;
+    renderCtx.lineWidth = settings[layer].StrokeWidth;
+    renderCtx.strokeText(settings[layer].value, 0, 0);
+  } else {
+    renderCtx.fillText(settings[layer].value, 0, 0);
+  }
+
+  return renderCanvas;
 }
 
 document.querySelectorAll("#showSettings").forEach((node) => {
@@ -180,11 +206,46 @@ function addLayer() {
   duplicateButton.innerHTML = `<span class="material-icons-round">content_copy</span>`;
   duplicateControl.appendChild(duplicateButton);
 
+  const maskControl = document.createElement("div");
+  maskControl.classList.add("layerControl");
+  maskControl.classList.add("mask");
+
+  const maskButton = document.createElement("button");
+  maskButton.addEventListener("click", (e) => {
+    event.stopPropagation();
+    //  enable masking
+    let target = e.target;
+    if (target.tagName === "SPAN") {
+      target = target.parentElement;
+    }
+    let masking = target.classList.toggle('active');
+    settings[selectedLayer].Masking = masking;
+
+    if (masking) {
+      maskingImg.style.display = "block";
+      maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+      if (settings[selectedLayer].Mask == null) {
+        const maskImg = new Image();
+        settings[selectedLayer].Mask = maskImg;
+      } else {
+        maskCtx.drawImage(settings[selectedLayer].Mask, 0, 0);
+
+      }
+    }
+    else {
+      maskingImg.style.display = "";
+    }
+    console.log("mask", masking);
+  });
+  maskButton.innerHTML = `<span class="material-icons-round">hide_image</span>`;
+  maskControl.appendChild(maskButton);
+
 
   const divBreak = document.createElement("div");
   divBreak.classList.add("break");
 
   div.appendChild(divBreak);
+  div.appendChild(maskControl)
   div.appendChild(duplicateControl)
   div.appendChild(input);
   div.appendChild(controls);
@@ -281,6 +342,19 @@ function changeSelectedLayer() {
   SetStrokeWidth(settings[selectedLayer].StrokeWidth ?? 0)
   setColor(settings[selectedLayer].Color ?? "#000000");
   setFont(settings[selectedLayer].Font ?? "sans-serif");
+
+  layers.children[selectedLayer].querySelector('.mask button').setAttribute('class', settings[selectedLayer].Masking ? "active" : "");
+  maskingImg.style.display = settings[selectedLayer].Masking ? "block" : "";
+
+  if (settings[selectedLayer].Masking) {
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+    if (settings[selectedLayer].Mask == null) {
+      const maskImg = new Image();
+      settings[selectedLayer].Mask = maskImg;
+    } else {
+      maskCtx.drawImage(settings[selectedLayer].Mask, 0, 0);
+    }
+  }
 
   lastScrolled = temp;
   setScrolling(lastScrolled);
@@ -409,9 +483,12 @@ function getLayer(t) {
 }
 
 function generateMad() {
-  for (var x = 0; x < 3; x++) addLayer();
+  for (var x = 0; x < 3; x++) {
+    settings.unshift(JSON.parse(JSON.stringify(settingsTemplate)));
+    addLayer()
+  };
 
-  settings = [
+  let madSettings = [
     {
       value: "☕",
       OffsetX: -105,
@@ -440,11 +517,19 @@ function generateMad() {
       Transparency: 100,
     },
   ];
+  let layer = 0;
+  madSettings.forEach(object => {
+    for (let key in object)
+      settings[layer][key] = object[key];
+    layer++;
+  });
+
   for (var x = 0; x < 3; x++)
     layers.children[x].querySelector("input").value = settings[x].value;
-  generateHatted();
   changeSelectedLayer();
   setScrolling(lastScrolled);
+  generateHatted();
+
 }
 function openImport() {
   document.getElementById("impexp").style.display = "block";

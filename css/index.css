@@ -24,6 +24,12 @@ img {
   -moz-user-select: none;
   -webkit-user-drag: none;
 }
+img#mask {
+  position: absolute;
+  transform: translate(0, -1.6rem);
+  background: rgba(255, 255, 255, 0);
+  display: none;
+}
 .controls {
   display: flex;
   flex-direction: column;
@@ -62,8 +68,15 @@ img {
   margin: 5px;
   display: none;
 }
+
+.selected > div.layerControl:not(.duplicate):not(.mask) {
+  padding-right: 49px;
+}
+
 .selected div.layerControl.duplicate,
-.block.layer.selected div.layerControl.duplicate button {
+.selected div.layerControl.mask,
+.block.layer.selected div.layerControl.duplicate button,
+.block.layer.selected div.layerControl.mask button {
   display: flex;
 }
 /* .block.layer.selected input {
@@ -196,6 +209,12 @@ button {
   cursor: pointer;
   margin: 0 auto;
 }
+
+button.active {
+  color: #121212;
+  background: white;
+}
+
 button:hover {
   color: white;
   background: gray;
@@ -203,6 +222,10 @@ button:hover {
 button:active {
   color: #121212;
   background: white;
+}
+button.active:active {
+  color: white;
+  background: #121212;
 }
 
 /* .material-icons-outlined,
