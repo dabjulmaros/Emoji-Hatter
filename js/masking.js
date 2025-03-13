@@ -60,7 +60,9 @@ maskingImg.addEventListener('wheel', e => {
   else if (maskingSettings.size > 200) {
     maskingSettings.size = 200;
   }
-  drawControl(controlCanvas.width / 2, controlCanvas.height / 2);
+  // drawControl(controlCanvas.width / 2, controlCanvas.height / 2);
+  // generateMask();
+  processMouse(e);
 });
 
 function processMouse(e) {
@@ -89,14 +91,11 @@ function processMouse(e) {
   }
 
   drawControl(x, y);
-
   if (e.buttons) {
     drawMask(x, y, e.altKey || e.buttons == 2);
+    generateHatted();
   }
-
   generateMask();
-
-  generateHatted();
 }
 
 function generateMask() {

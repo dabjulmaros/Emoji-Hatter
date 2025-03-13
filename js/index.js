@@ -45,13 +45,9 @@ function generateHatted() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-
-
   // The size of the emoji is set with the font
   for (var layer = settings.length - 1; layer >= 0; layer--) {
-
     ctx.drawImage(renderLayer(layer), 0, 0);
-
   }
 
 
@@ -77,8 +73,13 @@ function renderLayer(layer) {
   renderCtx.fillStyle = `rgba(${settings[layer].Color?.r ?? 0},${settings[layer].Color?.g ?? 0},${settings[layer].Color?.b ?? 0},${settings[layer].Transparency / 100})`;
 
   if (settings[layer].Mask != null) {
-    renderCtx.drawImage(settings[layer].Mask, 0, 0);
     renderCtx.globalCompositeOperation = 'source-out';
+    if (layer != selectedLayer) {
+      renderCtx.drawImage(settings[layer].Mask, 0, 0);
+    } else {
+      renderCtx.drawImage(maskCanvas, 0, 0)
+    }
+
   }
 
   renderCtx.translate(
@@ -229,7 +230,6 @@ function addLayer() {
         settings[selectedLayer].Mask = maskImg;
       } else {
         maskCtx.drawImage(settings[selectedLayer].Mask, 0, 0);
-
       }
     }
     else {
