@@ -222,19 +222,18 @@ function addLayer() {
     let masking = target.classList.toggle('active');
     settings[selectedLayer].Masking = masking;
 
+    maskingImg.style.display = settings[selectedLayer].Masking ? "block" : "";
+    maskingControl.style.opacity = settings[selectedLayer].Masking ? "1" : "0";
+
     if (masking) {
-      maskingImg.style.display = "block";
       maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
       if (settings[selectedLayer].Mask == null) {
         const maskImg = new Image();
         settings[selectedLayer].Mask = maskImg;
-      } else {
-        maskCtx.drawImage(settings[selectedLayer].Mask, 0, 0);
       }
+      maskCtx.drawImage(settings[selectedLayer].Mask, 0, 0);
     }
-    else {
-      maskingImg.style.display = "";
-    }
+
     console.log("mask", masking);
   });
   maskButton.innerHTML = `<span class="material-icons-round">hide_image</span>`;
@@ -345,16 +344,15 @@ function changeSelectedLayer() {
 
   layers.children[selectedLayer].querySelector('.mask button').setAttribute('class', settings[selectedLayer].Masking ? "active" : "");
   maskingImg.style.display = settings[selectedLayer].Masking ? "block" : "";
+  maskingControl.style.opacity = settings[selectedLayer].Masking ? "1" : "0";
 
-  if (settings[selectedLayer].Masking) {
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-    if (settings[selectedLayer].Mask == null) {
-      const maskImg = new Image();
-      settings[selectedLayer].Mask = maskImg;
-    } else {
-      maskCtx.drawImage(settings[selectedLayer].Mask, 0, 0);
-    }
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  if (settings[selectedLayer].Mask == null) {
+    const maskImg = new Image();
+    settings[selectedLayer].Mask = maskImg;
   }
+  maskCtx.drawImage(settings[selectedLayer].Mask, 0, 0);
+
 
   lastScrolled = temp;
   setScrolling(lastScrolled);

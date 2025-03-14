@@ -26,9 +26,12 @@ img {
 }
 img#mask {
   position: absolute;
-  transform: translate(0, -1.6rem);
+  /* transform: translate(0, -1.6rem); */
   background: rgba(255, 255, 255, 0);
   display: none;
+}
+#maskingControls {
+  opacity: 0;
 }
 .controls {
   display: flex;

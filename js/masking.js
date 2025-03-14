@@ -1,11 +1,15 @@
 /**
  * TODO:
- * 1-- Add controls for masking
- * 2-- Investigate flickering when masking
+ * 
 */
 
 const maskCanvas = document.createElement('canvas');
 const maskCtx = maskCanvas.getContext('2d');
+
+const maskingControl = document.getElementById('maskingControls')
+const toolToggle = document.getElementById('toolToggle');
+const squareTool = "check_box_outline_blank";
+const circleTool = "radio_button_unchecked";
 
 maskCanvas.width = canvas.width;
 maskCanvas.height = canvas.height;
@@ -23,6 +27,21 @@ let maskingSettings = { tool: 1, size: 10 };
 let setShift = false;
 let shiftDir = null;
 let shiftConstVal = 0;
+
+
+function toggleTool() {
+  let tool;
+  if (maskingSettings.tool == 1) {
+    maskingSettings.tool = 0;
+    tool = circleTool;
+  } else if (maskingSettings.tool == 0) {
+    maskingSettings.tool = 1;
+    tool = squareTool;
+  }
+  toolToggle.querySelector('.icon').textContent = tool;
+}
+toggleTool();
+
 
 maskingImg.addEventListener('mousemove', e => {
   e.preventDefault();

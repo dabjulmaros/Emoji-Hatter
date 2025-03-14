@@ -37,6 +37,14 @@
 <body>
   <canvas id="canvas" width="400" height="400" style='display:none'></canvas>
   <div class="controls">
+    <div class="block sec" id="maskingControls">
+      <div class="block">
+        <button id="toolToggle" onclick="toggleTool()">
+          <span class="material-icons-round icon">radio_button_unchecked</span>
+          <span>Switch Masking Tool</span>
+        </button>
+      </div>
+    </div>
     <img id="result" src="" />
     <img id="mask" />
     <div class="block sec">
